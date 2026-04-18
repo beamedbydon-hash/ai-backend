@@ -1,50 +1,55 @@
 import express from "express";
-import OpenAI from "openai";
 import cors from "cors";
 
 const app = express();
 
-// middleware
 app.use(cors());
 app.use(express.json());
 
-// OpenAI client (FIXED)
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Gemini API key
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // test route
 app.get("/", (req, res) => {
-  res.send("API is running");
+  res.send("Gemini API running");
 });
 
-// chat route
 app.post("/chat", async (req, res) => {
   try {
     const msg = req.body.message;
 
-    if (!msg) {
-      return res.status(400).json({ reply: "No message provided" });
-    }
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: msg }]
+            }
+          ]
+        })
+      }
+    );
 
-    const response = await client.responses.create({
-      model: "gpt-5.2",
-      input: msg,
-    });
+    const data = await response.json();
 
-    res.json({
-      reply: response.output_text || "No response",
-    });
+    const reply =
+      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "No response";
+
+    res.json({ reply });
 
   } catch (err) {
-    console.error("ERROR:", err);
+    console.error(err);
     res.status(500).json({ reply: "server error" });
   }
 });
 
-// IMPORTANT for Render
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
+  console.log("Gemini server running");
 });

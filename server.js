@@ -8,12 +8,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// OpenAI client
+// OpenAI client (FIXED)
 const client = new OpenAI({
-  api_key: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
-// test route (so browser works)
+// test route
 app.get("/", (req, res) => {
   res.send("API is running");
 });
@@ -42,7 +42,7 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// use Render's port
+// IMPORTANT for Render
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

@@ -1,6 +1,7 @@
 {
-  "name": "ai-backend",
+  "name": "donio-backend",
   "version": "1.0.0",
+  "description": "AI backend for Donio Builder",
   "main": "server.js",
   "type": "module",
   "scripts": {

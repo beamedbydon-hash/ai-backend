@@ -1,5 +1,14 @@
-"dependencies": {
-  "express": "^4.18.2",
-  "openai": "^4.0.0",
-  "cors": "^2.8.5"
+{
+  "name": "ai-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "openai": "^4.0.0",
+    "cors": "^2.8.5"
+  }
 }

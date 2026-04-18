@@ -3,51 +3,43 @@ import cors from "cors";
 
 const app = express();
 
+// IMPORTANT
 app.use(cors());
 app.use(express.json());
 
-// test route
+// health route (you already have this)
 app.get("/", (req, res) => {
   res.send("OpenRouter API running");
 });
 
-// chat route
-app.post("/chat", async (req, res) => {
-  try {
-    const msg = req.body.message;
+// 🔥 THIS IS WHAT YOU ARE MISSING
+app.post("/generate", async (req, res) => {
+  const { prompt } = req.body;
 
-    if (!msg) {
-      return res.status(400).json({ reply: "No message provided" });
-    }
+  console.log("Prompt:", prompt);
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json"
+  // TEMP TEST RESPONSE (so your site works first)
+  res.json({
+    projectName: "Sprint System",
+    summary: "Simple sprint system with stamina bar.",
+    items: [
+      {
+        kind: "RemoteEvent",
+        name: "SprintRemote",
+        parent: "ReplicatedStorage"
       },
-      body: JSON.stringify({
-        model: "openai/gpt-3.5-turbo", // FREE model
-        messages: [
-          { role: "user", content: msg }
-        ]
-      })
-    });
-
-    const data = await response.json();
-
-    const reply =
-      data.choices?.[0]?.message?.content || "No response";
-
-    res.json({ reply });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ reply: "server error" });
-  }
+      {
+        kind: "LocalScript",
+        name: "SprintClient",
+        parent: "StarterPlayerScripts",
+        source: "print('Sprint system running')"
+      }
+    ]
+  });
 });
 
+// start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("Server running");
+  console.log("Server running on port", PORT);
 });

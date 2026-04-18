@@ -6,40 +6,38 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Gemini API key
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
 // test route
 app.get("/", (req, res) => {
-  res.send("Gemini API running");
+  res.send("OpenRouter API running");
 });
 
+// chat route
 app.post("/chat", async (req, res) => {
   try {
     const msg = req.body.message;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: msg }]
-            }
-          ]
-        })
-      }
-    );
+    if (!msg) {
+      return res.status(400).json({ reply: "No message provided" });
+    }
+
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-3.5-turbo", // FREE model
+        messages: [
+          { role: "user", content: msg }
+        ]
+      })
+    });
 
     const data = await response.json();
 
     const reply =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "No response";
+      data.choices?.[0]?.message?.content || "No response";
 
     res.json({ reply });
 
@@ -51,5 +49,5 @@ app.post("/chat", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("Gemini server running");
+  console.log("Server running");
 });
